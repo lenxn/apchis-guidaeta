@@ -35,6 +35,6 @@ A few selected use cases are given in `main.py`:
 
 ### Publications
 
-When refering to the dataset please cite:
+When referring to the dataset please cite:
 
 * S. Lengauer, S.A. von Götz, M.T. Hoesch, F. Steinwidder, M. Tytarenko, M.A. Bedek, T. Schreck, *GUIDÆTA - A Versatile Interactions Dataset with extensive Context Information and Metadata*, 2025.
