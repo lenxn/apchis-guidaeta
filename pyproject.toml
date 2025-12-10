@@ -16,3 +16,5 @@ dependencies = [
   "numpy"
 ]
 
+[tool.setuptools.package-data]
+guidaeta = ["py.typed"]
