@@ -205,6 +205,30 @@ class User(FromDataFile):
         DKT2_ANSWER_11 = 18
         DKT2_ANSWER_12 = 19
         DKT2_ANSWER_13 = 20
+        DKT2_ANSWER_DURATION_0 = 21
+        DKT2_ANSWER_DURATION_1 = 22
+        DKT2_ANSWER_DURATION_2 = 23
+        DKT2_ANSWER_DURATION_3 = 24
+        DKT2_ANSWER_DURATION_4 = 25
+        DKT2_ANSWER_DURATION_5 = 26
+        DKT2_ANSWER_DURATION_6 = 27
+        DKT2_ANSWER_DURATION_7 = 28
+        DKT2_ANSWER_DURATION_8 = 29
+        DKT2_ANSWER_DURATION_9 = 30
+        DKT2_ANSWER_DURATION_10 = 31
+        DKT2_ANSWER_DURATION_11 = 32
+        DKT2_ANSWER_DURATION_12 = 33
+        DKT2_ANSWER_DURATION_13 = 34
+        SUS_RATING_0 = 35
+        SUS_RATING_1 = 36
+        SUS_RATING_2 = 37
+        SUS_RATING_3 = 38
+        SUS_RATING_4 = 39
+        SUS_RATING_5 = 40
+        SUS_RATING_6 = 41
+        SUS_RATING_7 = 42
+        SUS_RATING_8 = 43
+        SUS_RATING_9 = 44
 
     class Gender(StrEnum):
         NA = "na"
@@ -229,14 +253,36 @@ class User(FromDataFile):
         YES = "yes"
 
     class DiabetesKnowledge:
-
+        """The Michigan Diabetes Research and Training Center’s Revised 
+        Diabetes Knowledge Test (DKT2) is an established standardized 
+        questionnaire for estimating a participant's pre-knowledge on
+        diabetes."""
         REFERENCE_ANSWERS = ('b', 'c', 'a', 'd', 'c', 'b', 'b', 'c', 'a', 'b', 'a', 'c', 'b', 'd')
-        def __init__(self, answers: tuple[str, ...]):
+        def __init__(self, answers: tuple[tuple[str,int], ...]):
             assert len(answers)==len(__class__.REFERENCE_ANSWERS)
-            self._answers = answers
+            self._answers = [a[0] for a in answers]
 
         def score(self) -> float:
-            return sum(np.array(self._answers)==np.array(__class__.REFERENCE_ANSWERS))/len(self._answers)
+            return float(sum(np.array(self._answers)==np.array(__class__.REFERENCE_ANSWERS))/len(self._answers))
+
+    class SystemUsabilityScale:
+        """The System Usability Scale (SUS) is an established 10-item
+        questionnaire, designed to measure the perceived usability of
+        systems, software, or products.
+        Response options range from MIN_SCORE=`strongly disagree` to
+        MAX_SCORE=`strongly agree`.
+        """
+        NUM_ITEMS = 10
+        MIN_SCORE = 1
+        MAX_SCORE = 5
+        def __init__(self, scores: tuple[int|None, ...]):
+            assert len(scores)==__class__.NUM_ITEMS
+            self._scores: list[int|None] = list(scores)
+            assert None in self._scores or np.all(__class__.MIN_SCORE <= np.array(self._scores))
+            assert None in self._scores or np.all(__class__.MAX_SCORE >= np.array(self._scores))
+
+        def scores(self) -> list[int|None]:
+            return self._scores
 
     @property
     def data_field(self) -> type[DataField]:
@@ -271,6 +317,10 @@ class User(FromDataFile):
         return self._diabetes_knowledge
 
     @property
+    def system_usability_scale(self) -> SystemUsabilityScale:
+        return self._system_usability_scale
+
+    @property
     def task_answers(self) -> list[TaskAnswer]:
         return self._task_answers
 
@@ -287,20 +337,32 @@ class User(FromDataFile):
         self._handedness = User.Handedness(data[self.data_field.HANDEDNESS]) if data[self.data_field.HANDEDNESS] else None
         self._amblyopia = User.Amblyopia(data[self.data_field.AMBLYOPIA]) if data[self.data_field.AMBLYOPIA] else None
         self._diabetes_knowledge = User.DiabetesKnowledge((
-            data[self.data_field.DKT2_ANSWER_0],
-            data[self.data_field.DKT2_ANSWER_1],
-            data[self.data_field.DKT2_ANSWER_2],
-            data[self.data_field.DKT2_ANSWER_3],
-            data[self.data_field.DKT2_ANSWER_4],
-            data[self.data_field.DKT2_ANSWER_5],
-            data[self.data_field.DKT2_ANSWER_6],
-            data[self.data_field.DKT2_ANSWER_7],
-            data[self.data_field.DKT2_ANSWER_8],
-            data[self.data_field.DKT2_ANSWER_9],
-            data[self.data_field.DKT2_ANSWER_10],
-            data[self.data_field.DKT2_ANSWER_11],
-            data[self.data_field.DKT2_ANSWER_12],
-            data[self.data_field.DKT2_ANSWER_13],
+            (data[self.data_field.DKT2_ANSWER_0], int(data[self.data_field.DKT2_ANSWER_DURATION_0])),
+            (data[self.data_field.DKT2_ANSWER_1], int(data[self.data_field.DKT2_ANSWER_DURATION_1])),
+            (data[self.data_field.DKT2_ANSWER_2], int(data[self.data_field.DKT2_ANSWER_DURATION_2])),
+            (data[self.data_field.DKT2_ANSWER_3], int(data[self.data_field.DKT2_ANSWER_DURATION_3])),
+            (data[self.data_field.DKT2_ANSWER_4], int(data[self.data_field.DKT2_ANSWER_DURATION_4])),
+            (data[self.data_field.DKT2_ANSWER_5], int(data[self.data_field.DKT2_ANSWER_DURATION_5])),
+            (data[self.data_field.DKT2_ANSWER_6], int(data[self.data_field.DKT2_ANSWER_DURATION_6])),
+            (data[self.data_field.DKT2_ANSWER_7], int(data[self.data_field.DKT2_ANSWER_DURATION_7])),
+            (data[self.data_field.DKT2_ANSWER_8], int(data[self.data_field.DKT2_ANSWER_DURATION_8])),
+            (data[self.data_field.DKT2_ANSWER_9], int(data[self.data_field.DKT2_ANSWER_DURATION_9])),
+            (data[self.data_field.DKT2_ANSWER_10], int(data[self.data_field.DKT2_ANSWER_DURATION_10])),
+            (data[self.data_field.DKT2_ANSWER_11], int(data[self.data_field.DKT2_ANSWER_DURATION_11])),
+            (data[self.data_field.DKT2_ANSWER_12], int(data[self.data_field.DKT2_ANSWER_DURATION_12])),
+            (data[self.data_field.DKT2_ANSWER_13], int(data[self.data_field.DKT2_ANSWER_DURATION_13])),
+        ))
+        self._system_usability_scale = User.SystemUsabilityScale((
+            int(data[self.data_field.SUS_RATING_0]) if data[self.data_field.SUS_RATING_0] else None,
+            int(data[self.data_field.SUS_RATING_1]) if data[self.data_field.SUS_RATING_1] else None,
+            int(data[self.data_field.SUS_RATING_2]) if data[self.data_field.SUS_RATING_2] else None,
+            int(data[self.data_field.SUS_RATING_3]) if data[self.data_field.SUS_RATING_3] else None,
+            int(data[self.data_field.SUS_RATING_4]) if data[self.data_field.SUS_RATING_4] else None,
+            int(data[self.data_field.SUS_RATING_5]) if data[self.data_field.SUS_RATING_5] else None,
+            int(data[self.data_field.SUS_RATING_6]) if data[self.data_field.SUS_RATING_6] else None,
+            int(data[self.data_field.SUS_RATING_7]) if data[self.data_field.SUS_RATING_7] else None,
+            int(data[self.data_field.SUS_RATING_8]) if data[self.data_field.SUS_RATING_8] else None,
+            int(data[self.data_field.SUS_RATING_9]) if data[self.data_field.SUS_RATING_9] else None,
         ))
         self._task_answers: list[TaskAnswer] = []
 
@@ -774,6 +836,10 @@ class Session(FromDataFile):
     @property
     def to_ts(self) -> datetime:
         return self._to_ts
+
+    @property
+    def initialization_type(self) -> int:
+        return self._initialization_type
 
     @property
     def finalization_type(self) -> int:
