@@ -789,6 +789,9 @@ class Session(FromDataFile):
         of time.
         """
 
+        MIN_DURATION = 1.0
+        """The mininum duration for a dwelling in seconds."""
+
         GRACE_PERIOD = 1.0
         """The grace period for pauses, time spent on other dwellings."""
 
@@ -1178,7 +1181,6 @@ class Session(FromDataFile):
         3. Merge adjacent dwellings if their separating pause is too 
             short.
         4. Remove too short dwellings.
-
         """
 
         prev_dwelling = None
@@ -1253,6 +1255,7 @@ class Session(FromDataFile):
         dwellings: list[Session.Dwelling] = []
         current_dwelling = first_dwelling
         while current_dwelling:
-            dwellings.append(current_dwelling)
+            if current_dwelling.duration() >= Session.Dwelling.MIN_DURATION:
+                dwellings.append(current_dwelling)
             current_dwelling = current_dwelling.next
         self.dwellings = dwellings
