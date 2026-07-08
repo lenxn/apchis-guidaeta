@@ -251,6 +251,7 @@ class User(FromDataFile):
     class Amblyopia(StrEnum):
         NA = "na"
         YES = "yes"
+        NO = "no"
 
     class DiabetesKnowledge:
         """The Michigan Diabetes Research and Training Center’s Revised 
