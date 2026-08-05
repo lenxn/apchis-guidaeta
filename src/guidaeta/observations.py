@@ -51,7 +51,7 @@ def load_data(data_root: str) -> tuple[Sequence[Sentence],Sequence[Session],Sequ
 
     m_events_path = path.join(data_root, MOUSE_EVENTS_FOLDER)
     assert path.isdir(m_events_path)
-    for file in listdir(m_events_path):
+    for file in list(listdir(m_events_path)):
         m = re.match(MOUSE_EVENTS_FILE_NAME, file)
         if not m:
             print(f"[-] Unrecognized file name '{file}'")
@@ -67,7 +67,7 @@ def load_data(data_root: str) -> tuple[Sequence[Sentence],Sequence[Session],Sequ
 
     k_events_path = path.join(data_root, KEYBOARD_EVENTS_FOLDER)
     assert path.isdir(k_events_path)
-    for file in listdir(k_events_path):
+    for file in list(listdir(k_events_path)):
         m = re.match(KEYBOARD_EVENTS_FILE_NAME, file)
         if not m:
             print("[-] Unrecognized file name")
@@ -188,53 +188,61 @@ class User(FromDataFile):
         DATE_JOINED = 1
         AGE = 2
         GENDER = 3
-        EDUCATION = 4
-        HANDEDNESS = 5
-        AMBLYOPIA = 6
-        DKT2_ANSWER_0 = 7
-        DKT2_ANSWER_1 = 8
-        DKT2_ANSWER_2 = 9
-        DKT2_ANSWER_3 = 10
-        DKT2_ANSWER_4 = 11
-        DKT2_ANSWER_5 = 12
-        DKT2_ANSWER_6 = 13
-        DKT2_ANSWER_7 = 14
-        DKT2_ANSWER_8 = 15
-        DKT2_ANSWER_9 = 16
-        DKT2_ANSWER_10 = 17
-        DKT2_ANSWER_11 = 18
-        DKT2_ANSWER_12 = 19
-        DKT2_ANSWER_13 = 20
-        DKT2_ANSWER_DURATION_0 = 21
-        DKT2_ANSWER_DURATION_1 = 22
-        DKT2_ANSWER_DURATION_2 = 23
-        DKT2_ANSWER_DURATION_3 = 24
-        DKT2_ANSWER_DURATION_4 = 25
-        DKT2_ANSWER_DURATION_5 = 26
-        DKT2_ANSWER_DURATION_6 = 27
-        DKT2_ANSWER_DURATION_7 = 28
-        DKT2_ANSWER_DURATION_8 = 29
-        DKT2_ANSWER_DURATION_9 = 30
-        DKT2_ANSWER_DURATION_10 = 31
-        DKT2_ANSWER_DURATION_11 = 32
-        DKT2_ANSWER_DURATION_12 = 33
-        DKT2_ANSWER_DURATION_13 = 34
-        SUS_RATING_0 = 35
-        SUS_RATING_1 = 36
-        SUS_RATING_2 = 37
-        SUS_RATING_3 = 38
-        SUS_RATING_4 = 39
-        SUS_RATING_5 = 40
-        SUS_RATING_6 = 41
-        SUS_RATING_7 = 42
-        SUS_RATING_8 = 43
-        SUS_RATING_9 = 44
+        RELATION = 4
+        EDUCATION = 5
+        HANDEDNESS = 6
+        AMBLYOPIA = 7
+        DKT2_ANSWER_0 = 8
+        DKT2_ANSWER_1 = 9
+        DKT2_ANSWER_2 = 10
+        DKT2_ANSWER_3 = 11
+        DKT2_ANSWER_4 = 12
+        DKT2_ANSWER_5 = 13
+        DKT2_ANSWER_6 = 14
+        DKT2_ANSWER_7 = 15
+        DKT2_ANSWER_8 = 16
+        DKT2_ANSWER_9 = 17
+        DKT2_ANSWER_10 = 18
+        DKT2_ANSWER_11 = 19
+        DKT2_ANSWER_12 = 20
+        DKT2_ANSWER_13 = 21
+        DKT2_ANSWER_DURATION_0 = 22
+        DKT2_ANSWER_DURATION_1 = 23
+        DKT2_ANSWER_DURATION_2 = 24
+        DKT2_ANSWER_DURATION_3 = 25
+        DKT2_ANSWER_DURATION_4 = 26
+        DKT2_ANSWER_DURATION_5 = 27
+        DKT2_ANSWER_DURATION_6 = 28
+        DKT2_ANSWER_DURATION_7 = 29
+        DKT2_ANSWER_DURATION_8 = 30
+        DKT2_ANSWER_DURATION_9 = 31
+        DKT2_ANSWER_DURATION_10 = 32
+        DKT2_ANSWER_DURATION_11 = 33
+        DKT2_ANSWER_DURATION_12 = 34
+        DKT2_ANSWER_DURATION_13 = 35
+        SUS_RATING_0 = 36
+        SUS_RATING_1 = 37
+        SUS_RATING_2 = 38
+        SUS_RATING_3 = 39
+        SUS_RATING_4 = 40
+        SUS_RATING_5 = 41
+        SUS_RATING_6 = 42
+        SUS_RATING_7 = 43
+        SUS_RATING_8 = 44
+        SUS_RATING_9 = 45
 
     class Gender(StrEnum):
         NA = "na"
         MALE = "m"
         FEMALE = "f"
         DIVERSE = "d"
+
+    class Relation(StrEnum):
+        AFFECTED = "affected"
+        AFFILIATED = "affiliated"
+        BOTH = "both"
+        NONE = "none"
+        NA = "na"
 
     class Education(StrEnum):
         NA = "na"
@@ -287,7 +295,7 @@ class User(FromDataFile):
 
     @property
     def data_field(self) -> type[DataField]:
-        return User.DataField
+        return __class__.DataField
 
     @property
     def id(self) -> int:
@@ -300,6 +308,10 @@ class User(FromDataFile):
     @property
     def gender(self) -> Gender|None:
         return self._gender
+
+    @property
+    def relation(self) -> Relation|None:
+        return self._relation
 
     @property
     def education(self) -> Education|None:
@@ -334,6 +346,7 @@ class User(FromDataFile):
         self._joined = datetime.fromtimestamp(float(data[self.data_field.DATE_JOINED]))
         self._age = int(data[self.data_field.AGE]) if data[self.data_field.AGE] else None
         self._gender = User.Gender(data[self.data_field.GENDER]) if data[self.data_field.GENDER] else None
+        self._relation = User.Relation(data[self.data_field.RELATION]) if data[self.data_field.RELATION] else None
         self._education = User.Education(data[self.data_field.EDUCATION]) if data[self.data_field.EDUCATION] else None
         self._handedness = User.Handedness(data[self.data_field.HANDEDNESS]) if data[self.data_field.HANDEDNESS] else None
         self._amblyopia = User.Amblyopia(data[self.data_field.AMBLYOPIA]) if data[self.data_field.AMBLYOPIA] else None
